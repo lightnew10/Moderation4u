@@ -1,0 +1,17 @@
+name: Moderation4u
+main: fr.lightnew.Moderation4u
+version: Beta
+api-version: 1.16
+author: Lightnew
+description: Plugin by Lightnew -> https://github.com/lightnew10
+commands:
+  fly:
+    permission: base.staff
+  freeze:
+    permission: base.staff
+  invsee:
+    permission: base.staff
+  moderation:
+    permission: base.staff
+    aliases:
+      - mod
