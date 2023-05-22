@@ -33,11 +33,11 @@ public class Freeze implements CommandExecutor {
                     if (freeze_players.contains(target)) {
                         player.sendMessage(ChatColor.YELLOW + "Le joueur " + ChatColor.GOLD + target.getName() + ChatColor.YELLOW + " est bien " + ChatColor.GOLD + "dé-freeze");
                         target.sendMessage(ChatColor.YELLOW + "Vous êtes dé-freeze");
-                        freeze_players.remove(target);
+                        remove(target);
                     } else {
-                        player.sendMessage(ChatColor.YELLOW + "Le joueur " + ChatColor.GOLD + target.getName() + ChatColor.YELLOW + " est bien " + ChatColor.GOLD + "dé-freeze");
-                        target.sendMessage(ChatColor.YELLOW + "Vous êtes dé-freeze");
-                        freeze_players.add(target);
+                        player.sendMessage(ChatColor.YELLOW + "Le joueur " + ChatColor.GOLD + target.getName() + ChatColor.YELLOW + " est bien " + ChatColor.GOLD + " freeze");
+                        target.sendMessage(ChatColor.YELLOW + "Vous êtes freeze");
+                        set(target);
                     }
                 }
             } else {
@@ -45,5 +45,15 @@ public class Freeze implements CommandExecutor {
             }
         }
         return false;
+    }
+
+    public static void set(Player player) {
+        freeze_players.add(player);
+        player.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "Information" + ChatColor.GRAY + "] " + ChatColor.RED + "Vous venez d'être freeze, si vous vous déconnecter vous serez ban !");
+    }
+
+    public static void remove(Player player) {
+        freeze_players.remove(player);
+        player.sendMessage(ChatColor.GRAY + "[" + ChatColor.YELLOW + "Information" + ChatColor.GRAY + "] " + ChatColor.RED + "Vous venez d'être dé-freeze.");
     }
 }

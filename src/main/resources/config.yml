@@ -1,0 +1,6 @@
+Database:
+  host: "localhost"
+  database: "moderation"
+  port: 3306
+  username: "root"
+  password: ""

@@ -4,6 +4,7 @@ version: Beta
 api-version: 1.16
 author: Lightnew
 description: Plugin by Lightnew -> https://github.com/lightnew10
+depend: [ Core ]
 commands:
   fly:
     permission: base.staff
@@ -11,6 +12,11 @@ commands:
     permission: base.staff
   invsee:
     permission: base.staff
+  kick:
+    permission: base.staff
+  reports:
+    permission: base.staff
+  report:
   moderation:
     permission: base.staff
     aliases:
