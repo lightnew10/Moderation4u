@@ -6,6 +6,17 @@ author: Lightnew
 description: Plugin by Lightnew -> https://github.com/lightnew10
 depend: [ Core ]
 commands:
+  tban:
+    aliases:
+      - ban
+      - tempban
+    permission: advanced.staff
+  unban:
+    permission: advanced.staff
+  mute:
+    permission: advanced.staff
+  unmute:
+    permission: advanced.staff
   fly:
     permission: base.staff
   freeze:
@@ -17,6 +28,8 @@ commands:
   reports:
     permission: base.staff
   report:
+    aliases:
+      - rep
   moderation:
     permission: base.staff
     aliases:

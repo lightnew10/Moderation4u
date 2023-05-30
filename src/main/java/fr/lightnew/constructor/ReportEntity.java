@@ -110,6 +110,10 @@ public class ReportEntity {
         }
         if (index != -1)
             Report.reportsList.set(index, this);
+        else
+            return false;
+        Requests.moveReportToFinish(this);
+        Report.staffReportTake.remove(takeBy);
         return true;
     }
 

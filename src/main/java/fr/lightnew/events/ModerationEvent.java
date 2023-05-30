@@ -3,13 +3,16 @@ package fr.lightnew.events;
 import fr.lightnew.commands.Freeze;
 import fr.lightnew.commands.Moderation;
 import fr.lightnew.commands.Report;
+import fr.lightnew.commands.advance.BanEntity;
+import fr.lightnew.commands.advance.TimeType;
 import fr.lightnew.constructor.ReportEntity;
 import fr.lightnew.constructor.ReportStatut;
 import fr.lightnew.constructor.ReportsGui;
 import fr.lightnew.constructor.ReportsLogsGui;
-import fr.lightnew.tools.ItemBuilder;
-import fr.lightnew.tools.ObjectLoad;
-import fr.lightnew.tools.Vanish;
+import fr.lightnew.tools.*;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -26,6 +29,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.awt.*;
 import java.util.*;
 
 public class ModerationEvent implements Listener {
@@ -135,9 +139,9 @@ public class ModerationEvent implements Listener {
                 }
                 if (event.getClick().isLeftClick()) {
                     if (entity.take(player)) {
-                        player.closeInventory();
                         player.sendMessage(ChatColor.YELLOW + "Vous avez prit le report de " + ChatColor.GOLD + entity.getOwner() + ChatColor.YELLOW + " envers " + ChatColor.GOLD + entity.getTarget() + ChatColor.YELLOW + " pour " + ChatColor.GOLD + entity.getReason());
                         Report.staffReportTake.put(entity.getTakeBy(), entity);
+                        new ReportsGui(player).send();
                     }
                 }
             }
@@ -170,14 +174,21 @@ public class ModerationEvent implements Listener {
                     report.finish();
                     player.sendMessage(ChatColor.GREEN + "Vous venez de fermer le report. " + ChatColor.GRAY + "(/reports logs pour voir les logs)");
                     player.closeInventory();
-                    Report.staffReportTake.remove(player.getName());
                 }
                 if (event.getCurrentItem().getType() == Material.GOLDEN_AXE) {
-                    // TODO BAN TARGET FOR "REPORT ABUSIF" 3 DAYS
+                    new BanEntity(PlayerUUID.uuidWithName(Report.staffReportTake.get(player.getName()).getTarget()), player.getUniqueId(), "Report abusif", 3, TimeType.DAY).ban();
+                    if (!report.finish())
+                        player.sendMessage(ChatColor.RED + "Erreur lors de la fermeture du report.");
+                    player.closeInventory();
                 }
                 if (event.getCurrentItem().getType() == Material.RED_WOOL) {
-                    // TODO BAN TARGET FOR REASON REPORT
+                    ReportEntity entity = Report.staffReportTake.get(player.getName());
+                    new BanEntity(PlayerUUID.uuidWithName(entity.getTarget()), player.getUniqueId(), entity.getReason(), 3, TimeType.DAY).ban();
+                    if (!report.finish())
+                        player.sendMessage(ChatColor.RED + "Erreur lors de la fermeture du report.");
+                    player.closeInventory();
                 }
+                event.setCancelled(true);
             }
         }
     }
@@ -198,14 +209,15 @@ public class ModerationEvent implements Listener {
 
     private void sendReport(Player player, Player target, ItemStack itemStack) {
         ItemMeta meta = itemStack.getItemMeta();
-        String r = ChatColor.RED + "==========" + ChatColor.DARK_RED + "[" + ChatColor.GRAY + "Report" + ChatColor.DARK_RED + "]" + ChatColor.RED + "==========\n" +
-                ChatColor.RED + "Nouveau report de " + ChatColor.GRAY + player.getName() + ChatColor.RED + " envers " + ChatColor.GRAY + target.getName();
-        for (Player p : Bukkit.getOnlinePlayers())
-            if (p.hasPermission(ObjectLoad.permission_receive_report))
-                p.sendMessage(r);
-        player.sendMessage(ChatColor.YELLOW + "Votre report à bien été envoyé \"" + ChatColor.GOLD + meta.getDisplayName() + ChatColor.YELLOW + "\"");
         ReportEntity report = new ReportEntity(player.getName(), target.getName(), meta.getDisplayName(), new Date(), ReportStatut.WAIT, null, null, null);
         report.create();
+        String r = ChatColor.RED + "==========" + ChatColor.DARK_RED + "[" + ChatColor.GRAY + "Report" + ChatColor.DARK_RED + "]" + ChatColor.RED + "==========\n" +
+                ChatColor.RED + "Nouveau report de " + ChatColor.GRAY + player.getName() + ChatColor.RED + " envers " + ChatColor.GRAY + target.getName();
+        TextComponent component = ClickMSG.clickMSG(r, HoverEvent.Action.SHOW_TEXT, ChatColor.GREEN + "Prendre le Report", ClickEvent.Action.RUN_COMMAND, "/reports take " + report.getId());
+        for (Player p : Bukkit.getOnlinePlayers())
+            if (p.hasPermission(ObjectLoad.permission_receive_report))
+                p.spigot().sendMessage(component);
+        player.sendMessage(ChatColor.YELLOW + "Votre report à bien été envoyé \"" + ChatColor.GOLD + meta.getDisplayName() + ChatColor.YELLOW + "\"");
         player.closeInventory();
     }
 

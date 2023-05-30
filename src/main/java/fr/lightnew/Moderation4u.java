@@ -1,10 +1,16 @@
 package fr.lightnew;
 
 import fr.lightnew.commands.*;
+import fr.lightnew.commands.advance.Ban;
+import fr.lightnew.commands.advance.Mute;
+import fr.lightnew.commands.advance.UnBan;
+import fr.lightnew.commands.advance.UnMute;
 import fr.lightnew.constructor.ReportEntity;
 import fr.lightnew.constructor.ReportStatut;
 import fr.lightnew.events.ModerationEvent;
 import fr.lightnew.events.PlayerEvent;
+import fr.lightnew.events.SanctionEvent;
+import fr.lightnew.sql.RequestModeration;
 import fr.lightnew.sql.Requests;
 import fr.lightnew.tools.ObjectLoad;
 import org.bukkit.Bukkit;
@@ -35,6 +41,7 @@ public class Moderation4u extends JavaPlugin {
         PluginManager manager = Bukkit.getPluginManager();
         manager.registerEvents(new PlayerEvent(), this);
         manager.registerEvents(new ModerationEvent(), this);
+        manager.registerEvents(new SanctionEvent(), this);
         // Commands
         getCommand("fly").setExecutor(new Fly());
         getCommand("freeze").setExecutor(new Freeze());
@@ -43,12 +50,19 @@ public class Moderation4u extends JavaPlugin {
         getCommand("kick").setExecutor(new Kick());
         getCommand("report").setExecutor(new Report());
         getCommand("reports").setExecutor(new Reports());
+        getCommand("tban").setTabCompleter(new Ban());
+        getCommand("tban").setExecutor(new Ban());
+        getCommand("unban").setExecutor(new UnBan());
+        getCommand("mute").setExecutor(new Mute());
+        getCommand("mute").setTabCompleter(new Mute());
+        getCommand("unmute").setExecutor(new UnMute());
         // Database
         final String url = "jdbc:mysql://" + ObjectLoad.host + ":" + ObjectLoad.port + "/" + /*ObjectsPreset.database +*/ "?user=" + ObjectLoad.username + "&password=" + ObjectLoad.password; // Enter URL with db name
         try {
             connection = DriverManager.getConnection(url);
             Requests.createDatabase();
             Requests.createDefaultsTables();
+            RequestModeration.createDefaultsTables();
             log(ChatColor.YELLOW + "===========[Information]==========");
             log(ChatColor.GRAY + "[" + ChatColor.YELLOW + "Moderation4u" + ChatColor.GRAY + "] " + ChatColor.GREEN + "DataBase et tables chargées");
             log(ChatColor.YELLOW + "===========[Information]==========");
@@ -62,6 +76,7 @@ public class Moderation4u extends JavaPlugin {
             } else
                 Report.reportsFinishList.put(entity.getId(), entity);
         }
+        ObjectLoad.mutedPlayers = RequestModeration.getMutedPlayers();
     }
 
     @Override

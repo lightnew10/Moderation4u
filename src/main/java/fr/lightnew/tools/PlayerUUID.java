@@ -30,4 +30,23 @@ public class PlayerUUID {
             throw new RuntimeException(e);
         }
     }
+
+    public static String nameWithUUID(UUID name) {
+        try {
+            URL url = new URL("https://api.ashcon.app/mojang/v2/user/" + name.toString().replace("-", ""));
+            InputStream input = url.openConnection().getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            StringBuilder builder = new StringBuilder();
+            reader.lines().forEach(builder::append);
+            String line = builder.toString();
+
+            Gson gson = new Gson();
+            PlayerUUIDClazz obj = gson.fromJson(line, PlayerUUIDClazz.class);
+            return obj.getName();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -23,6 +23,7 @@ import org.bukkit.inventory.ItemStack;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class Reports implements CommandExecutor, TabCompleter {
 
@@ -38,6 +39,22 @@ public class Reports implements CommandExecutor, TabCompleter {
                 if (args[0].equalsIgnoreCase("logs") || args[0].equalsIgnoreCase("log")) {
                     ReportsLogsGui gui = new ReportsLogsGui(player);
                     gui.send();
+                }
+            }
+            if (args.length == 2) {
+                if (args[0].equalsIgnoreCase("take")) {
+                    if (UUID.fromString(args[1]) == null) {
+                        player.sendMessage(ChatColor.RED + "ID incorrecte.");
+                        return false;
+                    }
+                    UUID id = UUID.fromString(args[1]);
+                    ReportEntity entity = Report.reportsListID.get(id);
+                    if (entity.take(player)) {
+                        player.sendMessage(ChatColor.YELLOW + "Vous avez prit le report de " + ChatColor.GOLD + entity.getOwner() + ChatColor.YELLOW + " envers " + ChatColor.GOLD + entity.getTarget() + ChatColor.YELLOW + " pour " + ChatColor.GOLD + entity.getReason());
+                        Report.staffReportTake.put(entity.getTakeBy(), entity);
+                        new ReportsGui(player).send();
+                    }
+                    return true;
                 }
             }
         }
